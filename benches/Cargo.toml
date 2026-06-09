@@ -16,5 +16,5 @@ path = "main.rs"
 
 [dependencies]
 proc-macro2 = "1.0"
-quote = { path = ".." }
+quote = { path = "..", package = "quote-send" }
 termcolor = "1.1"
