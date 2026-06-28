@@ -9,14 +9,14 @@
 extern crate proc_macro;
 
 use proc_macro2::{Delimiter, Group, Ident, Span, TokenStream};
-use quote::{format_ident, quote, quote_spanned, TokenStreamExt};
+use quote_send::{format_ident, quote, quote_spanned, TokenStreamExt};
 use std::borrow::Cow;
 use std::collections::BTreeSet;
 use std::ffi::{CStr, CString};
 
 struct X;
 
-impl quote::ToTokens for X {
+impl quote_send::ToTokens for X {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         tokens.append(Ident::new("X", Span::call_site()));
     }
@@ -558,6 +558,12 @@ fn test_type_inference_for_span() {
         }
     }
 
+    impl CallSite for Cow<'_, Span> {
+        fn get() -> Self {
+            Cow::Owned(Span::call_site())
+        }
+    }
+
     let span = Span::call_site();
     let _ = quote_spanned!(span=> ...);
 
@@ -566,10 +572,4 @@ fn test_type_inference_for_span() {
 
     let inferred = CallSite::get();
     let _ = quote_spanned!(inferred=> ...);
-
-    #[cfg(feature = "proc-macro")]
-    if false {
-        let proc_macro_span = proc_macro::Span::call_site();
-        let _ = quote_spanned!(proc_macro_span.into()=> ...);
-    }
 }

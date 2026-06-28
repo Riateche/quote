@@ -1,4 +1,5 @@
-use self::get_span::{GetSpan, GetSpanBase, GetSpanInner};
+use self::get_span::GetSpan;
+use self::get_span::{GetSpanBase, GetSpanInner};
 use crate::{IdentFragment, ToTokens, TokenStreamExt};
 use core::fmt;
 use core::iter;
@@ -220,17 +221,17 @@ mod get_span {
 
     pub struct GetSpanBase<T>(pub(crate) T);
 
-    impl GetSpan<Span> {
+    impl<'a> GetSpan<&'a Span> {
         #[inline]
         pub fn __into_span(self) -> Span {
-            ((self.0).0).0
+            ((self.0).0).0.clone()
         }
     }
 
-    impl GetSpanInner<DelimSpan> {
+    impl<'a> GetSpanInner<&'a DelimSpan> {
         #[inline]
         pub fn __into_span(&self) -> Span {
-            (self.0).0.join()
+            (self.0).0.join().clone()
         }
     }
 
@@ -284,10 +285,10 @@ pub fn parse(tokens: &mut TokenStream, s: &str) {
 }
 
 #[doc(hidden)]
-pub fn parse_spanned(tokens: &mut TokenStream, span: Span, s: &str) {
+pub fn parse_spanned(tokens: &mut TokenStream, span: &Span, s: &str) {
     let s: TokenStream = s.parse().expect("invalid token stream");
     for token in s {
-        tokens.append(respan_token_tree(token, span));
+        tokens.append(respan_token_tree(token, span.clone()));
     }
 }
 
@@ -297,7 +298,7 @@ fn respan_token_tree(mut token: TokenTree, span: Span) -> TokenTree {
         TokenTree::Group(g) => {
             let mut tokens = TokenStream::new();
             for token in g.stream() {
-                tokens.append(respan_token_tree(token, span));
+                tokens.append(respan_token_tree(token, span.clone()));
             }
             *g = Group::new(g.delimiter(), tokens);
             g.set_span(span);
@@ -331,7 +332,7 @@ pub fn push_lifetime(tokens: &mut TokenStream, lifetime: &str) {
 pub fn push_lifetime_spanned(tokens: &mut TokenStream, span: Span, lifetime: &str) {
     tokens.append(TokenTree::Punct({
         let mut apostrophe = Punct::new('\'', Spacing::Joint);
-        apostrophe.set_span(span);
+        apostrophe.set_span(span.clone());
         apostrophe
     }));
     tokens.append(TokenTree::Ident(ident_maybe_raw(&lifetime[1..], span)));
@@ -359,7 +360,7 @@ macro_rules! push_punct {
         #[doc(hidden)]
         pub fn $spanned(tokens: &mut TokenStream, span: Span) {
             let mut punct = Punct::new($char1, Spacing::Joint);
-            punct.set_span(span);
+            punct.set_span(span.clone());
             tokens.append(punct);
             let mut punct = Punct::new($char2, Spacing::Alone);
             punct.set_span(span);
@@ -376,10 +377,10 @@ macro_rules! push_punct {
         #[doc(hidden)]
         pub fn $spanned(tokens: &mut TokenStream, span: Span) {
             let mut punct = Punct::new($char1, Spacing::Joint);
-            punct.set_span(span);
+            punct.set_span(span.clone());
             tokens.append(punct);
             let mut punct = Punct::new($char2, Spacing::Joint);
-            punct.set_span(span);
+            punct.set_span(span.clone());
             tokens.append(punct);
             let mut punct = Punct::new($char3, Spacing::Alone);
             punct.set_span(span);
@@ -470,7 +471,7 @@ fn ident_maybe_raw(id: &str, span: Span) -> Ident {
 pub struct IdentFragmentAdapter<T: IdentFragment>(pub T);
 
 impl<T: IdentFragment> IdentFragmentAdapter<T> {
-    pub fn span(&self) -> Option<Span> {
+    pub fn span(&self) -> Option<&Span> {
         self.0.span()
     }
 }

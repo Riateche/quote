@@ -9,13 +9,13 @@ error[E0599]: no method named `quote_into_iter` found for struct `Ipv4Addr` in t
   |
   = note: the following trait bounds were not satisfied:
           `Ipv4Addr: Iterator`
-          which is required by `Ipv4Addr: quote::__private::ext::RepIteratorExt`
+          which is required by `Ipv4Addr: quote_send::__private::ext::RepIteratorExt`
           `&Ipv4Addr: Iterator`
-          which is required by `&Ipv4Addr: quote::__private::ext::RepIteratorExt`
+          which is required by `&Ipv4Addr: quote_send::__private::ext::RepIteratorExt`
           `Ipv4Addr: ToTokens`
-          which is required by `Ipv4Addr: quote::__private::ext::RepToTokensExt`
+          which is required by `Ipv4Addr: quote_send::__private::ext::RepToTokensExt`
           `Ipv4Addr: Iterator`
-          which is required by `&mut Ipv4Addr: quote::__private::ext::RepIteratorExt`
+          which is required by `&mut Ipv4Addr: quote_send::__private::ext::RepIteratorExt`
 note: the traits `Iterator` and `ToTokens` must be implemented
  --> $RUST/core/src/iter/traits/iterator.rs
   |
@@ -28,7 +28,7 @@ note: the traits `Iterator` and `ToTokens` must be implemented
   | ^^^^^^^^^^^^^^^^^^
   = help: items from traits can only be used if the trait is implemented and in scope
   = note: the following traits define an item `quote_into_iter`, perhaps you need to implement one of them:
-          candidate #1: `quote::__private::ext::RepAsIteratorExt`
-          candidate #2: `quote::__private::ext::RepIteratorExt`
-          candidate #3: `quote::__private::ext::RepToTokensExt`
+          candidate #1: `quote_send::__private::ext::RepAsIteratorExt`
+          candidate #2: `quote_send::__private::ext::RepIteratorExt`
+          candidate #3: `quote_send::__private::ext::RepToTokensExt`
   = note: this error originates in the macro `$crate::quote_bind_into_iter` which comes from the expansion of the macro `quote` (in Nightly builds, run with -Z macro-backtrace for more info)

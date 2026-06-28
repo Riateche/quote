@@ -47,10 +47,10 @@ think of `TokenStream` as representing a fragment of Rust source code.
 [`TokenStream`]: https://docs.rs/proc-macro2/1.0/proc_macro2/struct.TokenStream.html
 
 Within the `quote!` macro, interpolation is done with `#var`. Any type
-implementing the [`quote::ToTokens`] trait can be interpolated. This includes
+implementing the [`quote_send::ToTokens`] trait can be interpolated. This includes
 most Rust primitive types as well as most of the syntax tree types from [`syn`].
 
-[`quote::ToTokens`]: https://docs.rs/quote/1.0/quote/trait.ToTokens.html
+[`quote_send::ToTokens`]: https://docs.rs/quote/1.0/quote/trait.ToTokens.html
 [`syn`]: https://github.com/dtolnay/syn
 
 ```rust
@@ -170,7 +170,7 @@ handle `ident` being a raw identifier.
 
 ```rust
 let concatenated = format!("_{}", ident);
-let varname = syn::Ident::new(&concatenated, ident.span());
+let varname = syn::Ident::new(&concatenated, ident.span().clone());
 quote! {
     let mut #varname = 0;
 }

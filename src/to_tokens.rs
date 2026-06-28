@@ -23,7 +23,7 @@ pub trait ToTokens {
     ///
     /// ```
     /// use proc_macro2::{TokenTree, Spacing, Span, Punct, TokenStream};
-    /// use quote::{TokenStreamExt, ToTokens};
+    /// use quote_send::{TokenStreamExt, ToTokens};
     ///
     /// pub struct Path {
     ///     pub global: bool,

@@ -16,7 +16,7 @@ pub trait TokenStreamExt: private::Sealed {
     /// For use by `ToTokens` implementations.
     ///
     /// ```
-    /// # use quote::{quote, TokenStreamExt, ToTokens};
+    /// # use quote_send::{quote, TokenStreamExt, ToTokens};
     /// # use proc_macro2::TokenStream;
     /// #
     /// struct X;

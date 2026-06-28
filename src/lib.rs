@@ -46,7 +46,7 @@
 //! [a]: https://serde.rs/
 //!
 //! ```
-//! # use quote::quote;
+//! # use quote_send::quote;
 //! #
 //! # let generics = "";
 //! # let where_clause = "";
@@ -212,7 +212,7 @@ macro_rules! __quote {
         /// # #[cfg(any())]
         /// use proc_macro::TokenStream;
         /// # use proc_macro2::TokenStream;
-        /// use quote::quote;
+        /// use quote_send::quote;
         ///
         /// # const IGNORE_TOKENS: &'static str = stringify! {
         /// #[proc_macro_derive(HeapSize)]
@@ -251,7 +251,7 @@ macro_rules! __quote {
         /// interpolated into later `quote!` invocations to build up a final result.
         ///
         /// ```
-        /// # use quote::quote;
+        /// # use quote_send::quote;
         /// #
         /// let type_definition = quote! {...};
         /// let methods = quote! {...};
@@ -276,7 +276,7 @@ macro_rules! __quote {
         ///
         /// ```edition2018
         /// # use proc_macro2::{self as syn, Span};
-        /// # use quote::quote;
+        /// # use quote_send::quote;
         /// #
         /// # let ident = syn::Ident::new("i", Span::call_site());
         /// #
@@ -293,7 +293,7 @@ macro_rules! __quote {
         ///
         /// ```
         /// # use proc_macro2::{Ident, Span};
-        /// # use quote::{format_ident, quote};
+        /// # use quote_send::{format_ident, quote};
         /// #
         /// # let ident = Ident::new("i", Span::call_site());
         /// #
@@ -310,12 +310,12 @@ macro_rules! __quote {
         ///
         /// ```
         /// # use proc_macro2::{self as syn, Span};
-        /// # use quote::quote;
+        /// # use quote_send::quote;
         /// #
         /// # let ident = syn::Ident::new("i", Span::call_site());
         /// #
         /// let concatenated = format!("_{}", ident);
-        /// let varname = syn::Ident::new(&concatenated, ident.span());
+        /// let varname = syn::Ident::new(&concatenated, ident.span().clone());
         /// quote! {
         ///     let mut #varname = 0;
         /// }
@@ -331,7 +331,7 @@ macro_rules! __quote {
         /// `field_type` of type `syn::Type` and want to invoke the constructor.
         ///
         /// ```
-        /// # use quote::quote;
+        /// # use quote_send::quote;
         /// #
         /// # let field_type = quote!(...);
         /// #
@@ -349,7 +349,7 @@ macro_rules! __quote {
         /// but for macros often the following is more convenient.
         ///
         /// ```
-        /// # use quote::quote;
+        /// # use quote_send::quote;
         /// #
         /// # let field_type = quote!(...);
         /// #
@@ -364,7 +364,7 @@ macro_rules! __quote {
         /// A similar pattern is appropriate for trait methods.
         ///
         /// ```
-        /// # use quote::quote;
+        /// # use quote_send::quote;
         /// #
         /// # let field_type = quote!(...);
         /// #
@@ -400,7 +400,7 @@ macro_rules! __quote {
         ///
         /// ```rust
         /// # use proc_macro2::{Ident, Span};
-        /// # use quote::quote;
+        /// # use quote_send::quote;
         /// #
         /// # const IGNORE: &str = stringify! {
         /// let msg = format!(...);
@@ -438,11 +438,11 @@ macro_rules! __quote {
         ///
         /// ```
         /// # use proc_macro2::{Ident, TokenStream};
-        /// # use quote::quote;
+        /// # use quote_send::quote;
         /// #
         /// # mod syn {
         /// #     use proc_macro2::{Literal, TokenStream};
-        /// #     use quote::{ToTokens, TokenStreamExt};
+        /// #     use quote_send::{ToTokens, TokenStreamExt};
         /// #
         /// #     pub struct Index(usize);
         /// #
@@ -541,7 +541,7 @@ __quote![
 ///
 /// ```
 /// # use proc_macro2::Span;
-/// # use quote::quote_spanned;
+/// # use quote_send::quote_spanned;
 /// #
 /// # const IGNORE_TOKENS: &'static str = stringify! {
 /// let span = /* ... */;
@@ -581,7 +581,7 @@ __quote![
 /// safely shared between threads.
 ///
 /// ```
-/// # use quote::{quote_spanned, TokenStreamExt, ToTokens};
+/// # use quote_send::{quote_spanned, TokenStreamExt, ToTokens};
 /// # use proc_macro2::{Span, TokenStream};
 /// #
 /// # struct Type;
@@ -622,7 +622,7 @@ __quote![
 #[macro_export]
 macro_rules! quote_spanned {
     ($span:expr=> $($tt:tt)*) => {{
-        let _span: $crate::__private::Span = $crate::__private::get_span($span).__into_span();
+        let _span: $crate::__private::Span = $crate::__private::get_span(&$span).__into_span();
         $crate::quote_spanned_with_expanded_span!{_span $($tt)*}
     }};
 }
@@ -1235,19 +1235,19 @@ macro_rules! quote_token_spanned {
     ($ident:ident $tokens:ident $span:ident) => {
         $crate::__private::push_ident_spanned(
             &mut $tokens,
-            $span,
+            $span.clone(),
             $crate::__private::stringify!($ident),
         );
     };
 
     (:: $tokens:ident $span:ident) => {
-        $crate::__private::push_colon2_spanned(&mut $tokens, $span);
+        $crate::__private::push_colon2_spanned(&mut $tokens, $span.clone());
     };
 
     (( $($inner:tt)* ) $tokens:ident $span:ident) => {
         $crate::__private::push_group_spanned(
             &mut $tokens,
-            $span,
+            $span.clone(),
             $crate::__private::Delimiter::Parenthesis,
             {
                 $crate::quote_spanned_with_expanded_span!{$span $($inner)*}
@@ -1258,7 +1258,7 @@ macro_rules! quote_token_spanned {
     ([ $($inner:tt)* ] $tokens:ident $span:ident) => {
         $crate::__private::push_group_spanned(
             &mut $tokens,
-            $span,
+            $span.clone(),
             $crate::__private::Delimiter::Bracket,
             {
                 $crate::quote_spanned_with_expanded_span!{$span $($inner)*}
@@ -1269,7 +1269,7 @@ macro_rules! quote_token_spanned {
     ({ $($inner:tt)* } $tokens:ident $span:ident) => {
         $crate::__private::push_group_spanned(
             &mut $tokens,
-            $span,
+            $span.clone(),
             $crate::__private::Delimiter::Brace,
             {
                 $crate::quote_spanned_with_expanded_span!{$span $($inner)*}
@@ -1278,193 +1278,193 @@ macro_rules! quote_token_spanned {
     };
 
     (# $tokens:ident $span:ident) => {
-        $crate::__private::push_pound_spanned(&mut $tokens, $span);
+        $crate::__private::push_pound_spanned(&mut $tokens, $span.clone());
     };
 
     (, $tokens:ident $span:ident) => {
-        $crate::__private::push_comma_spanned(&mut $tokens, $span);
+        $crate::__private::push_comma_spanned(&mut $tokens, $span.clone());
     };
 
     (. $tokens:ident $span:ident) => {
-        $crate::__private::push_dot_spanned(&mut $tokens, $span);
+        $crate::__private::push_dot_spanned(&mut $tokens, $span.clone());
     };
 
     (; $tokens:ident $span:ident) => {
-        $crate::__private::push_semi_spanned(&mut $tokens, $span);
+        $crate::__private::push_semi_spanned(&mut $tokens, $span.clone());
     };
 
     (: $tokens:ident $span:ident) => {
-        $crate::__private::push_colon_spanned(&mut $tokens, $span);
+        $crate::__private::push_colon_spanned(&mut $tokens, $span.clone());
     };
 
     (+ $tokens:ident $span:ident) => {
-        $crate::__private::push_add_spanned(&mut $tokens, $span);
+        $crate::__private::push_add_spanned(&mut $tokens, $span.clone());
     };
 
     (+= $tokens:ident $span:ident) => {
-        $crate::__private::push_add_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_add_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (& $tokens:ident $span:ident) => {
-        $crate::__private::push_and_spanned(&mut $tokens, $span);
+        $crate::__private::push_and_spanned(&mut $tokens, $span.clone());
     };
 
     (&& $tokens:ident $span:ident) => {
-        $crate::__private::push_and_and_spanned(&mut $tokens, $span);
+        $crate::__private::push_and_and_spanned(&mut $tokens, $span.clone());
     };
 
     (&= $tokens:ident $span:ident) => {
-        $crate::__private::push_and_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_and_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (@ $tokens:ident $span:ident) => {
-        $crate::__private::push_at_spanned(&mut $tokens, $span);
+        $crate::__private::push_at_spanned(&mut $tokens, $span.clone());
     };
 
     (! $tokens:ident $span:ident) => {
-        $crate::__private::push_bang_spanned(&mut $tokens, $span);
+        $crate::__private::push_bang_spanned(&mut $tokens, $span.clone());
     };
 
     (^ $tokens:ident $span:ident) => {
-        $crate::__private::push_caret_spanned(&mut $tokens, $span);
+        $crate::__private::push_caret_spanned(&mut $tokens, $span.clone());
     };
 
     (^= $tokens:ident $span:ident) => {
-        $crate::__private::push_caret_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_caret_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (/ $tokens:ident $span:ident) => {
-        $crate::__private::push_div_spanned(&mut $tokens, $span);
+        $crate::__private::push_div_spanned(&mut $tokens, $span.clone());
     };
 
     (/= $tokens:ident $span:ident) => {
-        $crate::__private::push_div_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_div_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (.. $tokens:ident $span:ident) => {
-        $crate::__private::push_dot2_spanned(&mut $tokens, $span);
+        $crate::__private::push_dot2_spanned(&mut $tokens, $span.clone());
     };
 
     (... $tokens:ident $span:ident) => {
-        $crate::__private::push_dot3_spanned(&mut $tokens, $span);
+        $crate::__private::push_dot3_spanned(&mut $tokens, $span.clone());
     };
 
     (..= $tokens:ident $span:ident) => {
-        $crate::__private::push_dot_dot_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_dot_dot_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (= $tokens:ident $span:ident) => {
-        $crate::__private::push_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (== $tokens:ident $span:ident) => {
-        $crate::__private::push_eq_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_eq_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (>= $tokens:ident $span:ident) => {
-        $crate::__private::push_ge_spanned(&mut $tokens, $span);
+        $crate::__private::push_ge_spanned(&mut $tokens, $span.clone());
     };
 
     (> $tokens:ident $span:ident) => {
-        $crate::__private::push_gt_spanned(&mut $tokens, $span);
+        $crate::__private::push_gt_spanned(&mut $tokens, $span.clone());
     };
 
     (<= $tokens:ident $span:ident) => {
-        $crate::__private::push_le_spanned(&mut $tokens, $span);
+        $crate::__private::push_le_spanned(&mut $tokens, $span.clone());
     };
 
     (< $tokens:ident $span:ident) => {
-        $crate::__private::push_lt_spanned(&mut $tokens, $span);
+        $crate::__private::push_lt_spanned(&mut $tokens, $span.clone());
     };
 
     (*= $tokens:ident $span:ident) => {
-        $crate::__private::push_mul_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_mul_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (!= $tokens:ident $span:ident) => {
-        $crate::__private::push_ne_spanned(&mut $tokens, $span);
+        $crate::__private::push_ne_spanned(&mut $tokens, $span.clone());
     };
 
     (| $tokens:ident $span:ident) => {
-        $crate::__private::push_or_spanned(&mut $tokens, $span);
+        $crate::__private::push_or_spanned(&mut $tokens, $span.clone());
     };
 
     (|= $tokens:ident $span:ident) => {
-        $crate::__private::push_or_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_or_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (|| $tokens:ident $span:ident) => {
-        $crate::__private::push_or_or_spanned(&mut $tokens, $span);
+        $crate::__private::push_or_or_spanned(&mut $tokens, $span.clone());
     };
 
     (? $tokens:ident $span:ident) => {
-        $crate::__private::push_question_spanned(&mut $tokens, $span);
+        $crate::__private::push_question_spanned(&mut $tokens, $span.clone());
     };
 
     (-> $tokens:ident $span:ident) => {
-        $crate::__private::push_rarrow_spanned(&mut $tokens, $span);
+        $crate::__private::push_rarrow_spanned(&mut $tokens, $span.clone());
     };
 
     (<- $tokens:ident $span:ident) => {
-        $crate::__private::push_larrow_spanned(&mut $tokens, $span);
+        $crate::__private::push_larrow_spanned(&mut $tokens, $span.clone());
     };
 
     (% $tokens:ident $span:ident) => {
-        $crate::__private::push_rem_spanned(&mut $tokens, $span);
+        $crate::__private::push_rem_spanned(&mut $tokens, $span.clone());
     };
 
     (%= $tokens:ident $span:ident) => {
-        $crate::__private::push_rem_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_rem_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (=> $tokens:ident $span:ident) => {
-        $crate::__private::push_fat_arrow_spanned(&mut $tokens, $span);
+        $crate::__private::push_fat_arrow_spanned(&mut $tokens, $span.clone());
     };
 
     (<< $tokens:ident $span:ident) => {
-        $crate::__private::push_shl_spanned(&mut $tokens, $span);
+        $crate::__private::push_shl_spanned(&mut $tokens, $span.clone());
     };
 
     (<<= $tokens:ident $span:ident) => {
-        $crate::__private::push_shl_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_shl_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (>> $tokens:ident $span:ident) => {
-        $crate::__private::push_shr_spanned(&mut $tokens, $span);
+        $crate::__private::push_shr_spanned(&mut $tokens, $span.clone());
     };
 
     (>>= $tokens:ident $span:ident) => {
-        $crate::__private::push_shr_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_shr_eq_spanned(&mut $tokens, $span.clone());
     };
 
     (* $tokens:ident $span:ident) => {
-        $crate::__private::push_star_spanned(&mut $tokens, $span);
+        $crate::__private::push_star_spanned(&mut $tokens, $span.clone());
     };
 
     (- $tokens:ident $span:ident) => {
-        $crate::__private::push_sub_spanned(&mut $tokens, $span);
+        $crate::__private::push_sub_spanned(&mut $tokens, $span.clone());
     };
 
     (-= $tokens:ident $span:ident) => {
-        $crate::__private::push_sub_eq_spanned(&mut $tokens, $span);
+        $crate::__private::push_sub_eq_spanned(&mut $tokens, $span.clone());
     };
 
     ($lifetime:lifetime $tokens:ident $span:ident) => {
         $crate::__private::push_lifetime_spanned(
             &mut $tokens,
-            $span,
+            $span.clone(),
             $crate::__private::stringify!($lifetime),
         );
     };
 
     (_ $tokens:ident $span:ident) => {
-        $crate::__private::push_underscore_spanned(&mut $tokens, $span);
+        $crate::__private::push_underscore_spanned(&mut $tokens, $span.clone());
     };
 
     ($other:tt $tokens:ident $span:ident) => {
         $crate::__private::parse_spanned(
             &mut $tokens,
-            $span,
+            $span.clone(),
             $crate::__private::stringify!($other),
         );
     };

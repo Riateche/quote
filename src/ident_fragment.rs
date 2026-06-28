@@ -18,13 +18,13 @@ pub trait IdentFragment {
     /// Span associated with this `IdentFragment`.
     ///
     /// If non-`None`, may be inherited by formatted identifiers.
-    fn span(&self) -> Option<Span> {
+    fn span(&self) -> Option<&Span> {
         None
     }
 }
 
 impl<T: IdentFragment + ?Sized> IdentFragment for &T {
-    fn span(&self) -> Option<Span> {
+    fn span(&self) -> Option<&Span> {
         <T as IdentFragment>::span(*self)
     }
 
@@ -34,7 +34,7 @@ impl<T: IdentFragment + ?Sized> IdentFragment for &T {
 }
 
 impl<T: IdentFragment + ?Sized> IdentFragment for &mut T {
-    fn span(&self) -> Option<Span> {
+    fn span(&self) -> Option<&Span> {
         <T as IdentFragment>::span(*self)
     }
 
@@ -44,7 +44,7 @@ impl<T: IdentFragment + ?Sized> IdentFragment for &mut T {
 }
 
 impl IdentFragment for Ident {
-    fn span(&self) -> Option<Span> {
+    fn span(&self) -> Option<&Span> {
         Some(self.span())
     }
 
@@ -62,7 +62,7 @@ impl<T> IdentFragment for Cow<'_, T>
 where
     T: IdentFragment + ToOwned + ?Sized,
 {
-    fn span(&self) -> Option<Span> {
+    fn span(&self) -> Option<&Span> {
         T::span(self)
     }
 

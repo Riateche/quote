@@ -15,6 +15,6 @@ name = "quote-benchmark"
 path = "main.rs"
 
 [dependencies]
-proc-macro2 = "1.0"
-quote = { path = "..", package = "quote-send" }
+proc-macro2 = { package = "proc-macro2-send", git = "https://github.com/Riateche/proc-macro2.git", branch = "send", default-features = false }
+quote-send = { path = ".." }
 termcolor = "1.1"

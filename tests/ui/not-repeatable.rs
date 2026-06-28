@@ -1,4 +1,4 @@
-use quote::quote;
+use quote_send::quote;
 
 struct Ipv4Addr;
 

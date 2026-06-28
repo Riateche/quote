@@ -41,7 +41,7 @@
 /// provided.
 ///
 /// ```
-/// # use quote::format_ident;
+/// # use quote_send::format_ident;
 /// # let ident = format_ident!("Ident");
 /// // If `ident` is an Ident, the span of `my_ident` will be inherited from it.
 /// let my_ident = format_ident!("My{}{}", ident, "IsCool");
@@ -52,7 +52,7 @@
 /// argument.
 ///
 /// ```
-/// # use quote::format_ident;
+/// # use quote_send::format_ident;
 /// # const IGNORE_TOKENS: &'static str = stringify! {
 /// let my_span = /* ... */;
 /// # };
@@ -76,7 +76,7 @@
 ///
 /// Composing raw and non-raw identifiers:
 /// ```
-/// # use quote::format_ident;
+/// # use quote_send::format_ident;
 /// let my_ident = format_ident!("My{}", "Ident");
 /// assert_eq!(my_ident, "MyIdent");
 ///
@@ -89,7 +89,7 @@
 ///
 /// Integer formatting options:
 /// ```
-/// # use quote::format_ident;
+/// # use quote_send::format_ident;
 /// let num: u32 = 10;
 ///
 /// let decimal = format_ident!("Id_{}", num);
@@ -152,7 +152,7 @@ macro_rules! format_ident_impl {
     };
     ([$span:expr, $($fmt:tt)*] $name:ident = $arg:expr, $($rest:tt)*) => {
         match $crate::__private::IdentFragmentAdapter(&$arg) {
-            arg => $crate::format_ident_impl!([$span.or(arg.span()), $($fmt)*, $name = arg] $($rest)*),
+            arg => $crate::format_ident_impl!([$span.or_else(|| arg.span().cloned()), $($fmt)*, $name = arg] $($rest)*),
         }
     };
 
@@ -162,7 +162,7 @@ macro_rules! format_ident_impl {
     };
     ([$span:expr, $($fmt:tt)*] $arg:expr, $($rest:tt)*) => {
         match $crate::__private::IdentFragmentAdapter(&$arg) {
-            arg => $crate::format_ident_impl!([$span.or(arg.span()), $($fmt)*, arg] $($rest)*),
+            arg => $crate::format_ident_impl!([$span.or_else(|| arg.span().cloned()), $($fmt)*, arg] $($rest)*),
         }
     };
 }

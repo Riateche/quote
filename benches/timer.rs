@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::io::Write;
 use std::time::Instant;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};

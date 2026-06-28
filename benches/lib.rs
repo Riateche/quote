@@ -4,22 +4,15 @@
     clippy::uninlined_format_args
 )]
 
-use quote::quote;
-
 #[allow(unused_macros)]
 macro_rules! benchmark {
     (|$ident:ident| $quote:expr) => {
         mod timer;
 
         use proc_macro::TokenStream;
-        use proc_macro2::Ident;
 
         #[proc_macro]
-        pub fn run_quote_benchmark(input: TokenStream) -> TokenStream {
-            let input = proc_macro2::TokenStream::from(input);
-            let span = input.into_iter().next().unwrap().span();
-            let $ident = Ident::new("Response", span);
-            timer::time("macro", || proc_macro::TokenStream::from($quote));
+        pub fn run_quote_benchmark(_input: TokenStream) -> TokenStream {
             TokenStream::new()
         }
     };
@@ -29,7 +22,7 @@ macro_rules! benchmark {
 use benchmark;
 
 crate::benchmark! {
-    |ident| quote! {
+    |ident| quote_send::quote! {
         impl<'de> _serde::Deserialize<'de> for #ident {
             fn deserialize<__D>(__deserializer: __D) -> _serde::export::Result<Self, __D::Error>
             where
